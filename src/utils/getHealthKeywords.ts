@@ -109,6 +109,7 @@ export const getHealthKeywords = () => {
     "Heart rate",
     "Blood pressure",
     "Hunger and thirst",
+    "sick",
   ];
   return keywords;
 };

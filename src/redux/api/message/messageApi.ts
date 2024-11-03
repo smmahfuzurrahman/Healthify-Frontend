@@ -47,6 +47,14 @@ const messageApi = baseApi.injectEndpoints({
         };
       },
     }),
+    removeConversation: builder.mutation({
+      query: (payload) => {
+        return {
+          url: `/conversations/${payload.id}`,
+          method: "DELETE",
+        };
+      },
+    }),
   }),
 });
 
@@ -55,5 +63,6 @@ export const {
   useStoreMessageMutation,
   useCreateConversationMutation,
   useGetUserConversationQuery,
-  useGetSingleConversationQuery
+  useGetSingleConversationQuery,
+  useRemoveConversationMutation
 } = messageApi;

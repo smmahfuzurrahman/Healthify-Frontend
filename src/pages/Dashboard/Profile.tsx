@@ -17,49 +17,68 @@ import {
   useUpdateUserProfileMutation,
 } from "@/redux/api/user/userApi";
 import { getErrorData } from "@/utils/getErrorData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 
 const Profile = () => {
+  const [, setCookie] = useCookies();
   // get profile info from db
-  const { data, isLoading } = useGetUserProfileQuery("");
+  const { data, isLoading,  } = useGetUserProfileQuery("");
   const [updateProfile] = useUpdateUserProfileMutation();
 
   // react-form-hook
   const { register, handleSubmit } = useForm();
   const [toggle, setToggle] = useState(true);
-  const [gender, setGender] = useState(data?.data.gender || "");
-  const [isPregnant, setIsPregnant] = useState(data?.data.isPregnant || "");
-  const [isDiabetes, setIsDiabetes] = useState(data?.data.isDiabetes || "");
-  const [bloodGroup, setBloodGroup] = useState(data?.data.bloodGroup || "");
-  const [profileStatus, setProfileStatus] = useState<number>(
-    data?.data.profileCompleteStatus
-  );
+
+  // State variables
+  const [gender, setGender] = useState("");
+  const [isPregnant, setIsPregnant] = useState("");
+  const [isDiabetes, setIsDiabetes] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("");
+  const [profileStatus, setProfileStatus] = useState<number>(0);
+  // Set initial state values when data is fetched
+  useEffect(() => {
+    if (data) {
+      console.log(data.data);
+      setGender(data.data.gender || "");
+      setIsPregnant(data.data.isPregnant || "");
+      setIsDiabetes(data.data.isDiabetes || "");
+      setBloodGroup(data.data.bloodGroup || "");
+      setProfileStatus(data.data.profileCompleteStatus || 0);
+    }
+  }, [data]);
 
   const onSubmit = async (data: any) => {
     const updatedProfileInfo = {
       gender,
-
       isDiabetes: isDiabetes.toLowerCase() === "yes",
-      isPregnant: isPregnant.toLowerCase() === "yes",
+      ...(gender === "female" && {
+        isPregnant: isPregnant.toLowerCase() === "yes",
+      }),
       bloodGroup,
       ...data,
     };
-
+    console.log(updatedProfileInfo);
     try {
       //   const response = await updateProfile(data);
       const response = await updateProfile(updatedProfileInfo);
 
       if (response.data) {
+        console.log(response.data);
         Swal.fire({
           title: "Success",
           text: "Profile updated successfully",
           icon: "success",
         });
         setToggle(!toggle); // Toggle state
-        console.log(response?.data?.data?.profileCompleteStatus);
-        setProfileStatus(response?.data?.data?.profileCompleteStatus);
+        setProfileStatus(
+          response?.data?.data?.updatedUser?.profileCompleteStatus
+        );
+        const token = response?.data?.data?.token as string;
+        setCookie("token", token);
+        // refetch();
       } else {
         const errorData = getErrorData(response.error);
         Swal.fire({
@@ -156,11 +175,8 @@ const Profile = () => {
               {toggle ? (
                 <Input
                   defaultValue={data?.data.bloodGroup}
-                  readOnly={toggle}
-                  placeholder="Your Blood Group"
-                  id="blood"
+                  readOnly={true}
                   type="text"
-                  {...register("bloodGroup", { required: true })}
                 />
               ) : (
                 <Select onValueChange={(value) => setBloodGroup(value)}>
@@ -186,39 +202,54 @@ const Profile = () => {
             {/* diabetic */}
             <div className="space-y-1">
               <Label htmlFor="isDiabetes">Diabetes</Label>
-
-              <Select onValueChange={(value) => setIsDiabetes(value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Diabetes Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Diabetes</SelectLabel>
-                    <SelectItem value="yes">Yes</SelectItem>
-                    <SelectItem value="no">No</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              {toggle ? (
+                <Input
+                  defaultValue={data?.data.isDiabetes ? "Yes" : "No"}
+                  readOnly={true}
+                  type="text"
+                />
+              ) : (
+                <Select onValueChange={(value) => setIsDiabetes(value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Diabetes Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Diabetes</SelectLabel>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             {/* gender */}
 
             <div className="space-y-1">
               <Label htmlFor="age">Gender</Label>
-              <Select
-                defaultValue={data?.data.gender}
-                onValueChange={(value) => setGender(value)}
-              >
-                <SelectTrigger className="">
-                  <SelectValue placeholder="Select your gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Gender</SelectLabel>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              {toggle ? (
+                <Input
+                  defaultValue={data?.data.gender}
+                  readOnly={true}
+                  type="text"
+                />
+              ) : (
+                <Select
+                  defaultValue={data?.data.gender}
+                  onValueChange={(value) => setGender(value)}
+                >
+                  <SelectTrigger className="">
+                    <SelectValue placeholder="Select your gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Gender</SelectLabel>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             {/* Pregnancy status (only show if gender is female) */}

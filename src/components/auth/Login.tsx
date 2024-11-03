@@ -52,7 +52,6 @@ const Login = () => {
       if (response.data && response.data.token) {
         // Store the token directly from the response
         const token = response.data.token;
-
         // Set the cookie with the token
         setCookie("token", token);
         Swal.fire({

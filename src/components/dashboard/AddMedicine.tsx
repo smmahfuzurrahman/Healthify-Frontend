@@ -36,18 +36,30 @@ const AddMedicine = () => {
   ];
   // days array
   const [days, setDays] = useState<string[]>([]);
-  // image upload status
-  const [imageUploadStatus, setImageUploadStatus] = useState(false);
+
+  const [imagePreview, setImagePreview] = useState<any>(); // Store image preview URL
+  const [selectedImage, setSelectedImage] = useState<any>(); // Store image preview URL
+
   // api
   const [AddMedicine, { isLoading }] = useAddMedicineMutation();
+
+  // handle image selection and preview
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImagePreview(URL.createObjectURL(file)); // Generate preview URL
+      setSelectedImage(file);
+    }
+  };
 
   // handle form submission
   const onSubmit = async (data: any) => {
     let imgUrl = "";
+
     const { name, power, time } = data;
-    if (data?.image && data.image[0]) {
+    if (selectedImage) {
       const formData = new FormData();
-      formData.append("image", data.image[0]);
+      formData.append("image", selectedImage);
       const img_hosting_token = import.meta.env.VITE_Image_Upload_token;
       const imgBBResponse = await fetch(
         `https://api.imgbb.com/1/upload?key=${img_hosting_token}`,
@@ -56,35 +68,35 @@ const AddMedicine = () => {
           body: formData,
         }
       );
-
       if (!imgBBResponse.ok) {
         throw new Error("Image upload failed");
       }
 
       const imgBBData = await imgBBResponse.json();
+
       imgUrl = imgBBData.data.url; // Get the image URL from ImgBB
-      setImageUploadStatus(true);
     }
     const medicine = {
       name,
-      power,
+      power: `${power}mg`,
       time,
       days,
       imgUrl,
     };
-
     try {
       //   const response = await updateProfile(data);
       const response = await AddMedicine(medicine);
-
       if (response.data) {
         Swal.fire({
           title: "Success",
           text: "Medicine added successfully",
           icon: "success",
         });
+        // clearing the form
         setDays([]);
         reset();
+        setSelectedImage(null);
+        setImagePreview(null);
       } else {
         const errorData = getErrorData(response.error);
         Swal.fire({
@@ -113,19 +125,22 @@ const AddMedicine = () => {
       selectedDays?.map((day: any) => day?.value) || [];
     setDays(medicineTakingDays);
   };
+
   return (
     <>
       <h1 className="text-center font-semibold text-3xl border-b-2 text-gradient mb-5">
         Add Medicine
       </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* image */}
-        {!imageUploadStatus ? (
-          <div className="flex items-center justify-center w-full mb-5">
-            <label
-              htmlFor="dropzone-file"
-              className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-200 duration-300 transition-all"
-            >
+        {/* Image Upload */}
+        <div className="flex items-center justify-center w-full mb-5">
+          <label
+            htmlFor="dropzone-file"
+            className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-200 duration-300 transition-all"
+          >
+            {imagePreview ? (
+              <img src={imagePreview} alt="Selected" className="h-32 mb-3" />
+            ) : (
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <CloudIcon />
                 <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
@@ -136,20 +151,20 @@ const AddMedicine = () => {
                   SVG, PNG, JPG or GIF (MAX. 800x400px)
                 </p>
               </div>
-              <input
-                id="dropzone-file"
-                type="file"
-                className="hidden"
-                {...register("image", { required: true })}
-              />
-              {errors.image && (
-                <p className="text-red-500 text-sm">Image is required</p>
-              )}
-            </label>
-          </div>
-        ) : (
-          <p className="text-green-500 text-center mb-5">Image uploaded!</p>
-        )}
+            )}
+            <input
+              id="dropzone-file"
+              type="file"
+              className="hidden"
+              required
+              onChange={handleImageChange} // Call the handler for image change
+            />
+            {errors.image && (
+              <p className="text-red-500 text-sm">Image is required</p>
+            )}
+          </label>
+        </div>
+
         {/* rest inputs */}
         <div className="grid grid-cols-2 gap-2">
           {/* name */}
@@ -168,13 +183,16 @@ const AddMedicine = () => {
             <Label htmlFor="power">
               Power/Mg <span className="text-gray-400">(ex. 50mg)</span>
             </Label>
-            <Input
-              className="placeholder:text-gray-400"
-              placeholder="Medicine power (20mg)"
-              id="power"
-              type="text"
-              {...register("power", { required: true })}
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                className="placeholder:text-gray-400"
+                placeholder="Medicine power (20mg)"
+                id="power"
+                type="number"
+                {...register("power", { required: true })}
+              />
+              <p>Mg</p>
+            </div>
           </div>
           {/* Reminder Time */}
           <div className="space-y-1">
@@ -203,8 +221,11 @@ const AddMedicine = () => {
           </div>
         </div>
         {/* buttons */}
-        <div className="mt-5">
-          {isLoading ? <Spinner /> : <Button>Add</Button>}
+        <div className="text-center mt-6">
+          {isLoading ? <Spinner /> :
+            <Button className="w-full md:w-auto px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+              Add Medicine
+            </Button>}
         </div>
       </form>
     </>

@@ -80,10 +80,11 @@ const NavMenu = () => {
           )}
         </div>
         <ul
-          className={`transition-all duration-300 ease-in-out transform ${isOpen
+          className={`transition-all duration-300 ease-in-out transform ${
+            isOpen
               ? "opacity-100 max-h-screen p-5"
               : "opacity-0 max-h-0 overflow-hidden"
-            }`}
+          }`}
         >
           {items}
         </ul>

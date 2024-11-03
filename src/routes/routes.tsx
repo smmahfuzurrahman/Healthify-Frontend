@@ -12,6 +12,7 @@ import PrivateRote from "./PrivateRote";
 import AdminRoute from "./AdminRoute";
 import Notification from "@/pages/Notification/Notification";
 import AllUsers from "@/pages/Dashboard/AllUsers";
+import PatientReport from "@/pages/Dashboard/PatientReport";
 
 export const router = createBrowserRouter([
   {
@@ -67,6 +68,10 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/medicines",
         element: <UserMedicine />,
+      },
+      {
+        path: "/dashboard/report",
+        element: <PatientReport />,
       },
       {
         path: "/dashboard/user-activities",
