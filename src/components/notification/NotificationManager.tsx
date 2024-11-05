@@ -28,6 +28,7 @@ const NotificationManager: React.FC = () => {
 
     socket.on("connect", () => {
       console.log("Socket connected:", socket.id);
+      // socket.id = user?.userId;
       const userId = user?.userId;
       socket.emit("register", userId);
     });
@@ -47,8 +48,10 @@ const NotificationManager: React.FC = () => {
 
   useEffect(() => {
     if (audioPlaying) {
-      audio.loop = true;
-      audio.play().catch((error) => console.error("Error playing audio:", error));
+      audio.loop = true; // Set audio to loop
+      audio
+        .play()
+        .catch((error) => console.error("Error playing audio:", error));
     } else {
       audio.pause();
       audio.currentTime = 0;
@@ -57,26 +60,18 @@ const NotificationManager: React.FC = () => {
 
   const handleDismiss = (index: number) => {
     dispatch(dismissNotification(index));
+    // Optionally check if there are no notifications left
     if (notifications.length === 1) {
-      dispatch(stopAudio());
+      dispatch(stopAudio()); // Stop audio if this was the last notification
     }
   };
 
   return (
-    <div className="fixed bottom-4 right-4 space-y-3">
+    <div className="hidden">
       {notifications.map((notification, index) => (
-        <div
-          key={index}
-          className="bg-blue-600 text-white rounded-md p-4 shadow-lg flex items-center space-x-3 transition duration-300 ease-in-out transform hover:scale-105"
-        >
+        <div key={index}>
           <span>{notification}</span>
-          <button
-            onClick={() => handleDismiss(index)}
-            className="ml-auto bg-red-500 hover:bg-red-700 text-white rounded-full p-1"
-            aria-label="Dismiss notification"
-          >
-            ✕
-          </button>
+          <button onClick={() => handleDismiss(index)}>Dismiss</button>
         </div>
       ))}
     </div>
