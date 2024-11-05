@@ -113,18 +113,18 @@ const Chat = () => {
   };
 
   if (user?.status < 100) {
-    Swal.fire("Complete your profile to start chatting!");
+    Swal.fire("You must complete your profile....");
     navigate("/dashboard/profile");
   }
 
   return (
-    <div className="flex gap-3 relative">
-      <aside className="w-1/4 bg-gray-200 p-4 h-screen sticky top-0">
+    <div className="flex flex-col md:flex-row gap-3">
+      <aside className="w-full md:w-1/4 bg-gray-200 p-4 h-64 md:h-screen overflow-y-auto md:sticky top-0">
         <ChatSideBar handleNewConversation={handleNewConversation} activeConversationId={conversationId} />
       </aside>
 
-      <main className="flex-1 flex flex-col bg-gray-50 relative">
-        <div className="flex-1 overflow-y-auto px-4 py-6">
+      <main className="flex-1 flex flex-col bg-gray-50">
+        <div className="flex-1 overflow-y-auto px-4 py-6 h-64 md:h-auto">
           {id && !isLoading && data?.data?.messages.map((message: any) => (
             <Message key={message._id} userQuery={message.query} reply={message.answer} loading={false} />
           ))}

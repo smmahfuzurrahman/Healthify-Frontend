@@ -70,29 +70,25 @@ const NavMenu = () => {
   );
 
   return (
-    <div>
-      <div onClick={() => setIsOpen(!isOpen)} className="block md:hidden">
-        <div className="transition-all duration-300 ease-in-out transform">
-          {isOpen ? (
-            <HiX className="rotate-180" />
-          ) : (
-            <HiMenuAlt1 className="rotate-0" />
-          )}
+    <nav className="p-4 bg-white shadow md:flex md:items-center md:justify-between">
+      <div className="flex justify-between items-center">
+        <div onClick={() => setIsOpen(!isOpen)} className="text-2xl cursor-pointer md:hidden">
+          {isOpen ? <HiX /> : <HiMenuAlt1 />}
         </div>
-        <ul
-          className={`transition-all duration-300 ease-in-out transform ${
-            isOpen
-              ? "opacity-100 max-h-screen p-5"
-              : "opacity-0 max-h-0 overflow-hidden"
-          }`}
-        >
-          {items}
-        </ul>
       </div>
-      <div>
-        <ul className="hidden md:flex items-center space-x-5">{items}</ul>
-      </div>
-    </div>
+
+      {/* Mobile Menu */}
+      <ul
+        className={`md:hidden absolute left-0 w-full bg-white transition-all duration-300 ease-in-out ${
+          isOpen ? "top-16 opacity-100" : "top-[-500px] opacity-0"
+        }`}
+      >
+        <div className="flex flex-col items-center p-4 space-y-3">{items}</div>
+      </ul>
+
+      {/* Desktop Menu */}
+      <ul className="hidden md:flex items-center space-x-5">{items}</ul>
+    </nav>
   );
 };
 

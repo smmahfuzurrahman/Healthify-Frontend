@@ -30,24 +30,25 @@ const Support = () => {
       image: img3,
     },
   ];
+
   return (
-    <div className="space-y-5 mt-16 p-5 md:p-9">
-      <h1 className="section-heading">Support and Features</h1>
-      <div className=" grid grid-cols-2 gap-5">
+    <div className="space-y-8 mt-16 p-5 md:p-9">
+      <h1 className="section-heading text-center">Support and Features</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         {data.map((item, index) => (
           <div
             key={index}
-            className="border flex flex-col items-center text-center p-5 space-y-3"
+            className="border rounded-lg shadow-md flex flex-col items-center text-center p-6 space-y-4 transition-transform transform hover:scale-105"
           >
-            <div className="w-20">
+            <div className="w-16 md:w-20">
               <img
                 src={item.image}
-                alt=""
-                className="object-fill w-full h-full"
+                alt={item.title}
+                className="object-contain w-full h-full"
               />
             </div>
-            <h3 className="font-semibold">{item.title}</h3>
-            <p className="text-color">{item.description}</p>
+            <h3 className="font-semibold text-lg">{item.title}</h3>
+            <p className="text-color text-sm md:text-base">{item.description}</p>
           </div>
         ))}
       </div>

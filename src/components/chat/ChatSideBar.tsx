@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "../ui/button";
-
 import useDecodedToken from "@/hook/useDecodedToken";
 import {
   useGetUserConversationQuery,
@@ -19,12 +18,10 @@ const ChatSideBar = ({
   activeConversationId: string | undefined;
 }) => {
   const user: any = useDecodedToken();
-  const { data, isLoading, refetch } = useGetUserConversationQuery(
-    user?.userId
-  );
+  const { data, isLoading, refetch } = useGetUserConversationQuery(user?.userId);
   const [deleteUserConversation] = useRemoveConversationMutation();
 
-  // conversation delete handler
+  // Conversation delete handler
   const handleDeleteChat = (id: string) => {
     Swal.fire({
       title: "Are you sure?",
@@ -40,7 +37,7 @@ const ChatSideBar = ({
         if (response.data) {
           Swal.fire({
             title: "Deleted!",
-            text: "Your medicine has been deleted.",
+            text: "Your conversation has been deleted.",
             icon: "success",
           });
           refetch();
@@ -54,12 +51,18 @@ const ChatSideBar = ({
       }
     });
   };
+
   return (
-    <>
-      <div className="text-center">
-        <Button onClick={handleNewConversation}>Add New Conversation</Button>
+    <div className="p-4 md:p-6 bg-white rounded-lg shadow-md">
+      {/* Add New Conversation Button */}
+      <div className="text-center mb-4">
+        <Button onClick={handleNewConversation} className="w-full md:w-auto">
+          Add New Conversation
+        </Button>
       </div>
-      <div className="mt-5">
+
+      {/* Chat List */}
+      <div className="overflow-y-auto max-h-64 md:max-h-[80vh]">
         {isLoading ? (
           <div className="flex items-center justify-center">
             <Spinner />
@@ -67,49 +70,33 @@ const ChatSideBar = ({
         ) : (
           <div className="space-y-2">
             {data?.data?.map((conversation: any) => (
-              <div key={conversation._id} className="flex items-center gap-1">
+              <div
+                key={conversation._id}
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100"
+              >
                 <Link
                   to={`/chat/${conversation._id}`}
-                  className={`p-3 block rounded-lg flex-1 ${
+                  className={`block flex-1 p-2 rounded-lg ${
                     conversation._id === activeConversationId
-                      ? "bg-primary text-white shadow-lg" // Highlight active conversation
+                      ? "bg-blue-500 text-white"
                       : "bg-gray-100 text-black"
                   }`}
                 >
                   {conversation.title}
                 </Link>
-                <button onClick={() => handleDeleteChat(conversation._id)}>
-                  <FaTrash className="text-red-500" />
+                <button
+                  onClick={() => handleDeleteChat(conversation._id)}
+                  className="text-red-500 hover:text-red-600 transition"
+                >
+                  <FaTrash />
                 </button>
               </div>
             ))}
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
 export default ChatSideBar;
-
-// import { Button } from "../ui/button";
-// import ChatList from "./ChatList";
-
-// const ChatSideBar = ({
-//   handleNewConversation,
-// }: {
-//   handleNewConversation: () => void;
-// }) => {
-//   return (
-//     <>
-//       <div className="text-center">
-//         <Button onClick={handleNewConversation}>Add New Conversation</Button>
-//       </div>
-//       <div className="mt-5">
-//         <ChatList />
-//       </div>
-//     </>
-//   );
-// };
-
-// export default ChatSideBar;
