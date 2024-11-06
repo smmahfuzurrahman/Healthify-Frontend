@@ -13,6 +13,7 @@ import AdminRoute from "./AdminRoute";
 import Notification from "@/pages/Notification/Notification";
 import AllUsers from "@/pages/Dashboard/AllUsers";
 import PatientReport from "@/pages/Dashboard/PatientReport";
+import UserBloodPressure from "@/pages/Dashboard/UserBloodPressure";
 
 export const router = createBrowserRouter([
   {
@@ -72,6 +73,10 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/report",
         element: <PatientReport />,
+      },
+      {
+        path: "/dashboard/bloodpressure",
+        element: <UserBloodPressure />,
       },
       {
         path: "/dashboard/user-activities",

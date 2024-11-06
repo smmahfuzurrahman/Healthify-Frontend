@@ -21,6 +21,9 @@ const SideNav = () => {
       <li>
         <SideActiveLink to="/dashboard/report">Patient Report</SideActiveLink>
       </li>
+      <li>
+        <SideActiveLink to="/dashboard/bloodpressure">Blood Pressure</SideActiveLink>
+      </li>
     </>
   );
   const adminNavItem = (
