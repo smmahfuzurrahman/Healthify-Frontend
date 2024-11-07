@@ -1,6 +1,5 @@
 import AddMedicine from "@/components/dashboard/AddMedicine";
 
-
 const AddMedicinePage = () => {
   return (
     <div>

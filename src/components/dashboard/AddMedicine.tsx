@@ -127,27 +127,27 @@ const AddMedicine = () => {
   };
 
   return (
-    <>
+    <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
       <h1 className="text-center font-semibold text-3xl border-b-2 text-gradient mb-5">
         Add Medicine
       </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Image Upload */}
-        <div className="flex items-center justify-center w-full mb-5">
+        <div className="flex flex-col items-center mb-6">
           <label
             htmlFor="dropzone-file"
-            className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-200 duration-300 transition-all"
+            className="flex flex-col items-center justify-center w-full h-60 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-200 transition-all duration-200"
           >
             {imagePreview ? (
-              <img src={imagePreview} alt="Selected" className="h-32 mb-3" />
+              <img src={imagePreview} alt="Selected" className="h-40 w-auto mb-3 object-cover" />
             ) : (
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <div className="flex flex-col items-center pt-5 pb-6">
                 <CloudIcon />
-                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mb-2 text-sm text-gray-500">
                   <span className="font-semibold">Click to upload</span> or drag
                   and drop
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500">
                   SVG, PNG, JPG or GIF (MAX. 800x400px)
                 </p>
               </div>
@@ -166,9 +166,9 @@ const AddMedicine = () => {
         </div>
 
         {/* rest inputs */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* name */}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
               placeholder="Medicine Name"
@@ -179,7 +179,7 @@ const AddMedicine = () => {
             />
           </div>
           {/* power */}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Label htmlFor="power">
               Power/Mg <span className="text-gray-400">(ex. 50mg)</span>
             </Label>
@@ -228,7 +228,7 @@ const AddMedicine = () => {
             </Button>}
         </div>
       </form>
-    </>
+    </div>
   );
 };
 
