@@ -67,11 +67,19 @@ const NotificationManager: React.FC = () => {
   };
 
   return (
-    <div className="hidden">
+<div className="fixed bottom-4 right-4 w-full max-w-sm">
       {notifications.map((notification, index) => (
-        <div key={index}>
-          <span>{notification}</span>
-          <button onClick={() => handleDismiss(index)}>Dismiss</button>
+        <div
+          key={index}
+          className="flex items-center justify-between bg-blue-100 border-l-4 border-blue-500 rounded-lg p-4 mb-4 shadow-lg transition-transform transform-gpu hover:scale-105"
+        >
+          <span className="text-gray-800">{notification}</span>
+          <button
+            onClick={() => handleDismiss(index)}
+            className="text-red-500 hover:text-red-600 font-semibold transition duration-200 ml-4"
+          >
+            Dismiss
+          </button>
         </div>
       ))}
     </div>
