@@ -181,7 +181,7 @@ const AddMedicine = () => {
           {/* power */}
           <div className="space-y-2">
             <Label htmlFor="power">
-              Power/Mg <span className="text-gray-400">(ex. 50mg)</span>
+              Power / Mg <span className="text-gray-400">(ex. 50mg)</span>
             </Label>
             <div className="flex items-center gap-2">
               <Input

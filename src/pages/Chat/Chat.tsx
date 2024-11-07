@@ -138,7 +138,7 @@ const Chat = () => {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ask your assistant..."
+              placeholder="Share Your Feelings......."
               className="flex-1 rounded-lg shadow-sm border-gray-300"
             />
             <Button onClick={handleSend} className="rounded-full p-3 bg-blue-600 text-white">
