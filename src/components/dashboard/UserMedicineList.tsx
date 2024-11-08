@@ -50,16 +50,16 @@ const UserMedicineList = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-center font-semibold text-3xl border-b-2 text-gradient mb-5">
-        A List of Your Medicines
+    <div className="p-6 md:p-8 lg:p-10 bg-white shadow-md rounded-lg max-w-5xl mx-auto">
+      <h1 className="text-center font-semibold text-3xl md:text-4xl text-gradient mb-8">
+        Your Medicine List
       </h1>
       {isLoading ? (
         <div className="flex justify-center items-center h-40">
-          <span className="loader"></span> {/* Add a CSS loader for better loading experience */}
+          <div className="loader"></div> {/* Loader CSS added below */}
         </div>
       ) : (
-        <Table>
+        <Table className="w-full">
           <TableHeader>
             <TableRow>
               <TableHead>Image</TableHead>
@@ -75,28 +75,28 @@ const UserMedicineList = () => {
               data.data.map((medicine: any) => (
                 <TableRow key={medicine._id}>
                   <TableCell>
-                    <div className="w-[100px] h-[100px]">
+                    <div className="w-20 h-20 md:w-24 md:h-24">
                       <img
                         src={medicine.imgUrl}
                         alt={medicine.name}
-                        className="object-cover w-full h-full rounded-lg"
+                        className="object-cover w-full h-full rounded-md"
                       />
                     </div>
                   </TableCell>
-                  <TableCell>{medicine.name}</TableCell>
-                  <TableCell>{medicine.power}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="font-medium text-gray-700">{medicine.name}</TableCell>
+                  <TableCell className="text-gray-600">{medicine.power}</TableCell>
+                  <TableCell className="text-center text-gray-600">
                     {convertHourTime(medicine.time)}
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex flex-wrap items-center justify-center gap-2">
                       {medicine.days.map((day: string, index: number) => (
-                        <p
+                        <span
                           key={index}
-                          className="text-sm p-2 bg-blue-50 text-gray-600 rounded-lg shadow-sm"
+                          className="text-sm p-2 bg-blue-100 text-blue-600 rounded-full"
                         >
                           {day}
-                        </p>
+                        </span>
                       ))}
                     </div>
                   </TableCell>
@@ -104,7 +104,7 @@ const UserMedicineList = () => {
                     <Button
                       onClick={() => handleDeleteMedicine(medicine._id)}
                       size="sm"
-                      className="bg-red-500 text-white hover:bg-red-600 transition duration-150 ease-in-out"
+                      className="bg-red-500 text-white hover:bg-red-600 transition duration-200 ease-in-out"
                     >
                       Delete
                     </Button>
@@ -113,7 +113,7 @@ const UserMedicineList = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center">
+                <TableCell colSpan={6} className="text-center text-gray-500">
                   No medicines found.
                 </TableCell>
               </TableRow>

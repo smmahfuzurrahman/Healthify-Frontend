@@ -5,36 +5,79 @@ interface BloodPressure {
     systolic: number;
     diastolic: number;
     date: string;
+    status: string;
 }
 
 const UserBloodPressure: React.FC = () => {
     const [systolic, setSystolic] = useState<number | "">("");
     const [diastolic, setDiastolic] = useState<number | "">("");
     const [records, setRecords] = useState<BloodPressure[]>([]);
+    const [statusMessage, setStatusMessage] = useState<string>("");
+
+    // Function to determine blood pressure status and message
+    const getStatus = (systolic: number, diastolic: number): string => {
+        if (systolic === 120 && diastolic === 80) {
+            return "Normal";
+        } else if (systolic >= 119 || diastolic >= 79) {
+            return "Pre-hypertension";
+        }
+        else if (systolic >= 180 || diastolic >= 110) {
+            return 'Hypertensive crisis';
+        }
+        else if (systolic === 80 || diastolic >= 60) {
+            return 'Low';
+        }
+        else{
+            return "";
+        }
+    };
+
+    const getSuggestion = (status: string): string => {
+        if (status === "High Stage I") {
+            return "Stage I high blood pressure-hypertension. Consider lifestyle changes like reducing sodium intake, managing stress, regular exercise, and consulting with a healthcare provider.";
+        }
+        else if (status === "High Stage II") {
+            return "Stage II high blood pressure-hypertension. Consider lifestyle changes like reducing sodium intake, managing stress, regular exercise, and consulting with a healthcare provider.";
+        }
+        else if (status === 'Pre-hypertension') {
+            return "High blood pressure-hypertension. You can Exercise regularly,Stop using tobacco products,Manage your stress, and consulting with a healthcare provider.";
+        }
+        else if (status === 'Hypertensive crisis') {
+            return "Hypertensive crisis (emergency you should consult a doctor)";
+        }
+        else if (status === 'Normal') {
+            return "Your blood pressure is normal. Keep maintaining a healthy lifestyle";
+        }
+        else {
+            return "Condition not good. Your blood pressure is low. You can take foods with high salt content You should consult a doctor";
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (systolic !== "" && diastolic !== "") {
+            const status = getStatus(Number(systolic), Number(diastolic));
             const newRecord: BloodPressure = {
                 systolic: Number(systolic),
                 diastolic: Number(diastolic),
                 date: new Date().toLocaleString(),
+                status,
             };
             setRecords([...records, newRecord]);
+            setStatusMessage(getSuggestion(status));
             setSystolic("");
             setDiastolic("");
-            console.log(records)
+            console.log(records);
         }
     };
 
     const handleDelete = (index: number) => {
-        console.log(index)
         const updatedRecords = records.filter((_, i) => i !== index);
         setRecords(updatedRecords);
     };
 
     return (
-        <div className="p-6 bg-gray-100 min-h-screen flex flex-col items-center font-sans">
+        <div className="p-6 md:p-8 lg:p-10 bg-white shadow-md rounded-lg max-w-5xl mx-auto">
             <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white rounded-lg shadow-lg p-6">
                 {/* Blood Pressure Tracker Form */}
                 <div className="w-full md:w-1/2 p-4">
@@ -67,6 +110,12 @@ const UserBloodPressure: React.FC = () => {
                             Add Record
                         </button>
                     </form>
+                    {/* Status message for blood pressure */}
+                    {statusMessage && (
+                        <div className="mt-4 p-3 bg-gray-50 border-l-4 border-blue-500 text-blue-800 rounded">
+                            {statusMessage}
+                        </div>
+                    )}
                 </div>
 
                 {/* Records Section */}
@@ -81,6 +130,9 @@ const UserBloodPressure: React.FC = () => {
                                             <p className="text-gray-700 font-medium">
                                                 Systolic: <span className="font-semibold">{record.systolic} mmHg</span> <br />
                                                 Diastolic: <span className="font-semibold">{record.diastolic} mmHg</span>
+                                            </p>
+                                            <p className="text-gray-600 text-sm mt-1">
+                                                Status: <span className={record.status === "High Stage I" ? "text-red-200" : record.status === "High Stage II" ? "text-red-300" : record.status === "Pre-hypertension" ? "text-red-400" : record.status === "Hypertensive crisis" ? "text-red-500" : record.status === "Low" ? "text-yellow-500" : record.status === "Normal" ? "text-green-500" : "text-black-500"}>{record.status}</span>
                                             </p>
                                             <p className="text-xs text-gray-500 mt-1">Recorded on {record.date}</p>
                                         </div>
