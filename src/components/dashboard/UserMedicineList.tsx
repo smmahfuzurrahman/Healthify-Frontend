@@ -14,10 +14,12 @@ import {
 import { convertHourTime } from "@/utils/convertHourTime";
 import { Button } from "../ui/button";
 import Swal from "sweetalert2";
+import { useState } from "react";
 
 const UserMedicineList = () => {
   const { data, isLoading, refetch } = useGetUserMedicinesQuery("");
   const [deleteMedicine] = useRemoveMedicineMutation();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleDeleteMedicine = async (id: string) => {
     Swal.fire({
@@ -49,11 +51,27 @@ const UserMedicineList = () => {
     });
   };
 
+  const filteredMedicines = data?.data.filter((medicine: any) =>
+    medicine.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="p-6 md:p-8 lg:p-10 bg-white shadow-md rounded-lg max-w-5xl mx-auto">
       <h1 className="text-center font-semibold text-3xl md:text-4xl text-gradient mb-8">
         Your Medicine List
       </h1>
+
+      {/* Search Bar */}
+      <div className="mb-6 flex justify-center">
+        <input
+          type="text"
+          placeholder="Search by medicine name..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="p-2 border border-gray-300 rounded-md w-full md:w-1/2"
+        />
+      </div>
+
       {isLoading ? (
         <div className="flex justify-center items-center h-40">
           <div className="loader"></div> {/* Loader CSS added below */}
@@ -71,8 +89,8 @@ const UserMedicineList = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.data.length ? (
-              data.data.map((medicine: any) => (
+            {filteredMedicines?.length ? (
+              filteredMedicines.map((medicine: any) => (
                 <TableRow key={medicine._id}>
                   <TableCell>
                     <div className="w-20 h-20 md:w-24 md:h-24">

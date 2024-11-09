@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
+import { FaUser, FaFemale, FaMale } from "react-icons/fa"; // React Icons
 
 const Profile = () => {
   const [, setCookie] = useCookies();
@@ -38,10 +39,10 @@ const Profile = () => {
   const [isDiabetes, setIsDiabetes] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
   const [profileStatus, setProfileStatus] = useState<number>(0);
+  
   // Set initial state values when data is fetched
   useEffect(() => {
     if (data) {
-      console.log(data.data);
       setGender(data.data.gender || "");
       setIsPregnant(data.data.isPregnant || "");
       setIsDiabetes(data.data.isDiabetes || "");
@@ -60,33 +61,25 @@ const Profile = () => {
       bloodGroup,
       ...data,
     };
-    console.log(updatedProfileInfo);
     try {
-      //   const response = await updateProfile(data);
       const response = await updateProfile(updatedProfileInfo);
 
       if (response.data) {
-        console.log(response.data);
         Swal.fire({
           title: "Success",
           text: "Profile updated successfully",
           icon: "success",
         });
         setToggle(!toggle); // Toggle state
-        setProfileStatus(
-          response?.data?.data?.updatedUser?.profileCompleteStatus
-        );
+        setProfileStatus(response?.data?.data?.updatedUser?.profileCompleteStatus);
         const token = response?.data?.data?.token as string;
         setCookie("token", token);
-        // refetch();
       } else {
         const errorData = getErrorData(response.error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text:
-            errorData?.message ||
-            "An error occurred while updating the profile",
+          text: errorData?.message || "An error occurred while updating the profile",
         });
       }
     } catch (error) {
@@ -102,6 +95,16 @@ const Profile = () => {
     }
   };
 
+  // Function to render the avatar based on gender
+  const renderAvatar = () => {
+    if (gender === "female") {
+      return <FaFemale size={60} className="text-pink-500" />;
+    } else if (gender === "male") {
+      return <FaMale size={60} className="text-blue-500" />;
+    }
+    return <FaUser size={60} className="text-gray-500" />;
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-lg">
       {/* profile completion */}
@@ -114,14 +117,23 @@ const Profile = () => {
           className="w-full bg-blue-100"
         />
       </div>
+
       {/* profile details */}
       <h1 className="text-center font-semibold text-3xl border-b-2 text-gradient mb-5">
         Profile
       </h1>
+      
       {!isLoading && data && (
         <>
+          {/* Avatar Section */}
+          <div className="flex justify-center mb-5">
+            <div className="w-24 h-24 rounded-full border-2 border-gray-300 flex items-center justify-center">
+              {renderAvatar()}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* name */}
+            {/* Name */}
             <div className="space-y-1">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -133,7 +145,8 @@ const Profile = () => {
                 {...register("name", { required: true })}
               />
             </div>
-            {/* email */}
+
+            {/* Email */}
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -145,7 +158,8 @@ const Profile = () => {
                 {...register("email", { required: true })}
               />
             </div>
-            {/* phone */}
+
+            {/* Phone */}
             <div className="space-y-1">
               <Label htmlFor="phone">Phone No.</Label>
               <Input
@@ -157,7 +171,8 @@ const Profile = () => {
                 {...register("phone", { required: true })}
               />
             </div>
-            {/* age */}
+
+            {/* Age */}
             <div className="space-y-1">
               <Label htmlFor="age">Age</Label>
               <Input
@@ -169,7 +184,8 @@ const Profile = () => {
                 {...register("age", { required: true })}
               />
             </div>
-            {/* blood */}
+
+            {/* Blood Group */}
             <div className="space-y-1">
               <Label htmlFor="blood">Blood Group</Label>
               {toggle ? (
@@ -188,10 +204,10 @@ const Profile = () => {
                       <SelectLabel>Blood Group</SelectLabel>
                       <SelectItem value="A+">A+</SelectItem>
                       <SelectItem value="A-">A-</SelectItem>
-                      <SelectItem value="B+"> B+</SelectItem>
+                      <SelectItem value="B+">B+</SelectItem>
                       <SelectItem value="B-">B-</SelectItem>
                       <SelectItem value="AB+">AB+</SelectItem>
-                      <SelectItem value="AB-">B-</SelectItem>
+                      <SelectItem value="AB-">AB-</SelectItem>
                       <SelectItem value="O+">O+</SelectItem>
                       <SelectItem value="O-">O-</SelectItem>
                     </SelectGroup>
@@ -199,7 +215,8 @@ const Profile = () => {
                 </Select>
               )}
             </div>
-            {/* diabetic */}
+
+            {/* Diabetes */}
             <div className="space-y-1">
               <Label htmlFor="isDiabetes">Diabetes</Label>
               {toggle ? (
@@ -223,10 +240,10 @@ const Profile = () => {
                 </Select>
               )}
             </div>
-            {/* gender */}
 
+            {/* Gender */}
             <div className="space-y-1">
-              <Label htmlFor="age">Gender</Label>
+              <Label htmlFor="gender">Gender</Label>
               {toggle ? (
                 <Input
                   defaultValue={data?.data.gender}
@@ -238,7 +255,7 @@ const Profile = () => {
                   defaultValue={data?.data.gender}
                   onValueChange={(value) => setGender(value)}
                 >
-                  <SelectTrigger className="">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select your gender" />
                   </SelectTrigger>
                   <SelectContent>
@@ -252,7 +269,7 @@ const Profile = () => {
               )}
             </div>
 
-            {/* Pregnancy status (only show if gender is female) */}
+            {/* Pregnancy Status (Only show if gender is female) */}
             {gender === "female" && (
               <div className="space-y-1">
                 <Label htmlFor="isPregnant">Pregnancy</Label>
@@ -270,7 +287,8 @@ const Profile = () => {
                 </Select>
               </div>
             )}
-            {/* address */}
+            
+            {/* Address */}
             <div className="space-y-1">
               <Label htmlFor="address">Address</Label>
               <Input
@@ -279,11 +297,12 @@ const Profile = () => {
                 placeholder="Your Address"
                 id="address"
                 type="text"
-                {...register("address", { required: true})}
+                {...register("address", { required: true })}
               />
             </div>
           </div>
-          {/* buttons */}
+
+          {/* Buttons */}
           <div className="flex gap-2 mt-5">
             {toggle ? (
               <Button onClick={() => setToggle(!toggle)}>Edit</Button>

@@ -42,7 +42,9 @@ const Chat = () => {
   }, [id]);
 
   const handleSend = async () => {
+
     if (!query.trim()) return;
+    setQuery("");
 
     setConversation((prev) => [
       ...prev,
@@ -59,7 +61,7 @@ const Chat = () => {
             : msg
         )
       );
-      setQuery("");
+      // setQuery("");
     } else {
       // Generative AI and Conversation Handling Logic
       try {
@@ -84,7 +86,7 @@ const Chat = () => {
         Swal.fire({ title: "Error", text: "Failed to fetch response", icon: "error" });
       }
     }
-    setQuery("");
+    
   };
 
   const storeMessageInConversationLogic = async (convId: string, text: string) => {
