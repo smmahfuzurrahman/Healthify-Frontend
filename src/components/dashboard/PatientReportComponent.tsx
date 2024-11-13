@@ -15,12 +15,18 @@ import Spinner from "../ui/Spinner";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import CloudIcon from "../ui/CloudIcon";
-import { useAddMedicineMutation } from "@/redux/api/medicine/medicineApi";
 import { getErrorData } from "@/utils/getErrorData";
 import Swal from "sweetalert2";
+import {
+  useAddReportMutation,
+  useGetReportsQuery,
+} from "@/redux/api/report/reportApi";
+import useDecodedToken from "@/hook/useDecodedToken";
 
 const PatientReportComponent = () => {
-  const [AddMedicine, { isLoading }] = useAddMedicineMutation();
+  const user: any = useDecodedToken();
+  const [addReport, { isLoading }] = useAddReportMutation();
+  const { refetch } = useGetReportsQuery("");
   // react-form-hook
   const {
     register,
@@ -32,6 +38,8 @@ const PatientReportComponent = () => {
   const [imagePreview, setImagePreview] = useState<any>(); // Store image preview URL
   const [selectedImage, setSelectedImage] = useState<any>(); // Store image preview URL
 
+  // handle dialog box open
+  const [open, setOpen] = useState(false);
   // handle image selection and preview
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,9 +51,18 @@ const PatientReportComponent = () => {
 
   // handle form submission
   const onSubmit = async (data: any) => {
-    let imgUrl = "";
+    let prescriptionImg = "";
+    let reportImg = "";
 
-    const { name, power, time } = data;
+    const {
+      doctorName,
+      doctorNumber,
+      symptom,
+      appointment,
+      reportImg: reportImageFile,
+    } = data;
+
+    // Upload prescription image if it exists
     if (selectedImage) {
       const formData = new FormData();
       formData.append("image", selectedImage);
@@ -57,41 +74,72 @@ const PatientReportComponent = () => {
           body: formData,
         }
       );
+
       if (!imgBBResponse.ok) {
         throw new Error("Image upload failed");
       }
 
       const imgBBData = await imgBBResponse.json();
-
-      imgUrl = imgBBData.data.url; // Get the image URL from ImgBB
+      prescriptionImg = imgBBData.data.url; // Get the image URL from ImgBB
     }
-    const medicine = {
-      name,
-      power: `${power}mg`,
-      time,
-      imgUrl,
+
+    // Upload report image if it exists
+    if (reportImageFile && reportImageFile[0]) {
+      const formData = new FormData();
+      formData.append("image", reportImageFile[0]);
+      const img_hosting_token = import.meta.env.VITE_Image_Upload_token;
+      const imgBBResponse = await fetch(
+        `https://api.imgbb.com/1/upload?key=${img_hosting_token}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!imgBBResponse.ok) {
+        throw new Error("Report image upload failed");
+      }
+
+      const imgBBData = await imgBBResponse.json();
+      reportImg = imgBBData.data.url; // Get the image URL from ImgBB
+    }
+
+    const report = {
+      userId: user?.userId,
+      prescriptionImg,
+      reportImg, // Add report image URL
+      doctorName,
+      doctorNumber,
+      symptom,
+      appointment,
     };
+
     try {
-      //   const response = await updateProfile(data);
-      const response = await AddMedicine(medicine);
+      const response = await addReport(report);
       if (response.data) {
+        setOpen(false);
         Swal.fire({
           title: "Success",
-          text: "Medicine added successfully",
+          text: "Report added successfully",
           icon: "success",
         });
-        // clearing the form
 
+        // Clearing the form
         reset();
+
         setSelectedImage(null);
         setImagePreview(null);
+        refetch();
       } else {
         const errorData = getErrorData(response.error);
         Swal.fire({
           icon: "error",
           title: "Oops...",
           text:
-            errorData?.message || "An error occurred while adding the medicine",
+            errorData?.message || "An error occurred while adding the report",
+          customClass: {
+            popup: "custom-popup",
+          },
         });
       }
     } catch (error) {
@@ -106,8 +154,9 @@ const PatientReportComponent = () => {
       });
     }
   };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="default">Add Medical Report</Button>
       </DialogTrigger>
@@ -118,30 +167,7 @@ const PatientReportComponent = () => {
             fill up the fields and store your medical history
           </DialogDescription>
         </DialogHeader>
-        {/* <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                defaultValue="Pedro Duarte"
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Username
-              </Label>
-              <Input
-                id="username"
-                defaultValue="@peduarte"
-                className="col-span-3"
-              />
-            </div>
-          </div> */}
-
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form>
           {/* Image Upload */}
           <div className="flex items-center justify-center w-full mb-5">
             <label
@@ -187,7 +213,7 @@ const PatientReportComponent = () => {
                 id="name"
                 type="text"
                 className="placeholder:text-gray-400"
-                {...register("doctor", { required: true })}
+                {...register("doctorName", { required: true })}
               />
             </div>
             {/* Doctor Phone Number */}
@@ -211,7 +237,7 @@ const PatientReportComponent = () => {
                   className="placeholder:text-gray-400"
                   placeholder="Patient Symptom"
                   id="symptom"
-                  type="number"
+                  type="text"
                   {...register("symptom", { required: true })}
                 />
               </div>
@@ -220,7 +246,7 @@ const PatientReportComponent = () => {
             <div className="space-y-1">
               <Label htmlFor="date">Appointment Date</Label>
               <Input
-                {...register("date", { required: true })}
+                {...register("appointment", { required: true })}
                 placeholder="Appointment Date"
                 id="date"
                 className="col-span-3"
@@ -228,30 +254,26 @@ const PatientReportComponent = () => {
               />
             </div>
             {/* Doctor Advise */}
-            <div className="space-y-1">
+            <div className="space-y-1 col-span-2 mb-2">
               <Label htmlFor="advise">Doctor Advise(Reports)</Label>
               <div className="flex items-center gap-2">
-                {/* <Input
-                  className="placeholder:text-gray-400"
-                  placeholder="Doctor Advise"
-                  id="advise"
-                  type="number"
-                  {...register("advise", { required: true })}
-                /> */}
                 <Input
                   className="placeholder:text-gray-400"
                   placeholder="Doctor Advise"
                   id="advise"
                   type="file"
-                   accept="application/pdf"
-                  {...register("advise", { required: true })}
+                  {...register("reportImg", { required: true })}
                 />
               </div>
             </div>
           </div>
         </form>
         <DialogFooter>
-          {isLoading ? <Spinner /> : <Button>Add Details</Button>}
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <Button onClick={handleSubmit(onSubmit)}>Add Details</Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

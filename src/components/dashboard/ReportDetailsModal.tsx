@@ -1,104 +1,109 @@
-import { Button } from "@/components/ui/button";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import img from "@/assets/med.png";
+import { stringToTime } from "@/utils/stringToTime";
+import { Button } from "../ui/button";
 
-const ReportDetailsModal = ({ id }: { id: string }) => {
+const ReportDetailsModal = ({ report }: any) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <p className="p-2 shadow-sm rounded-md cursor-pointer">Report Title</p>
+        <Button className="p-3 shadow-md rounded-lg cursor-pointer text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+          View Details
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Your previous medical History</DialogTitle>
-          {/* <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DialogDescription> */}
+      <DialogContent className="p-6 max-w-md">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-xl font-semibold">Your Medical History</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          {/* prescription image */}
-          <div className="flex flex-col items-start gap-4">
-            <Label htmlFor="name" className="text-right">
+        <div className="grid gap-6 py-2">
+          {/* Prescription Image */}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="prescriptionImg" className="text-gray-700 font-medium">
               Prescription Image
             </Label>
-            <div className="w-[200px] mx-auto">
-              <img src={img} alt="" />
+            <div className="w-[200px] h-[200px] border rounded-lg overflow-hidden shadow-sm mx-auto">
+              <img
+                src={report?.prescriptionImg}
+                alt="Prescription"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
-          {/* doctor name */}
+
+          {/* Doctor Name */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+            <Label htmlFor="doctorName" className="col-span-1 text-gray-700 font-medium">
               Doctor Name
             </Label>
             <Input
-              id="name"
-              defaultValue="Pedro Duarte"
+              id="doctorName"
+              defaultValue={report?.doctorName}
               className="col-span-3"
               readOnly
             />
           </div>
-          {/* doctor number */}
+
+          {/* Doctor Phone Number */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="doctorNumber" className="text-right">
-              Doctor Number
+            <Label htmlFor="doctorNumber" className="col-span-1 text-gray-700 font-medium">
+              Phone Number
             </Label>
             <Input
               id="doctorNumber"
-              defaultValue="+8801800000"
+              defaultValue={report?.doctorNumber}
               className="col-span-3"
               readOnly
             />
           </div>
-          {/* symptom */}
+
+          {/* Symptom */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="symptom" className="text-right">
-              Patient Symptom
+            <Label htmlFor="symptom" className="col-span-1 text-gray-700 font-medium">
+              Symptom
             </Label>
             <Input
               id="symptom"
-              defaultValue="Fever"
+              defaultValue={report?.symptom}
               className="col-span-3"
               readOnly
             />
           </div>
-          {/* appointment date */}
+
+          {/* Appointment Date */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date" className="text-right">
+            <Label htmlFor="date" className="col-span-1 text-gray-700 font-medium">
               Appointment Date
             </Label>
             <Input
               id="date"
-              defaultValue="20-10-2024"
+              defaultValue={stringToTime(report?.appointment)}
               className="col-span-3"
               readOnly
             />
           </div>
-          {/* Doctor Advise */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="advise" className="text-right">
-              Doctor Advise
+
+          {/* Report Image */}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="reportImg" className="text-gray-700 font-medium">
+              Report Image
             </Label>
-            <Input
-              id="advise"
-              defaultValue="take rest"
-              className="col-span-3"
-            />
+            <div className="w-[200px] h-[200px] border rounded-lg overflow-hidden shadow-sm mx-auto">
+              <img
+                src={report?.reportImg}
+                alt="Report"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
-        
         </div>
-        {/* <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter> */}
       </DialogContent>
     </Dialog>
   );
